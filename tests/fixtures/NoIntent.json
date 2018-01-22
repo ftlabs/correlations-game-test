@@ -1,0 +1,22 @@
+{
+  "session": { 
+    "attributes": {},
+    "sessionId": "0",
+    "application": { 
+      "applicationId": "amzn1.echo-sdk-ams.app.123"
+    },
+    "user": { 
+      "userId": "test-user"
+    },
+    "new": true
+  },
+ "request": { 
+   "type": "IntentRequest",
+    "locale": "en-GB",
+    "requestId": "request-id-1234",
+    "timestamp": null,
+    "intent": {
+      "name": "AMAZON.NoIntent"
+    }
+  }
+}

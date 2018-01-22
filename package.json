@@ -1,0 +1,25 @@
+{
+  "name": "alexa-flow-tester",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha tests/ --timeout 10000",
+    "test-html": "mocha tests/ --timeout 10000 --reporter mochawesome"
+    
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "*",
+    "chai": "^4.1.2",
+    "chai-http": "^3.0.0",
+    "chai-string": "^1.4.0",
+    "mochawesome": "^3.0.1"
+  },
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "node-fetch": "^1.7.3",
+    "should": "^13.2.1"
+  }
+}
