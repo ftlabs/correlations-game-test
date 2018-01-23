@@ -1,10 +1,17 @@
 const LaunchRequest = require('../tests/fixtures/LaunchRequest');
 const YesIntent = require('../tests/fixtures/YesIntent');
+const NoIntent = require('../tests/fixtures/NoIntent');
 const AnswerIntent = require('../tests/fixtures/AnswerIntent');
+const RepeatIntent =  require('../tests/fixtures/RepeatIntent');
 const HelpIntent = require('../tests/fixtures/HelpIntent');
+const StopIntent = require('../tests/fixtures/StopIntent');
+const StartOverIntent = require('../tests/fixtures/StartOverIntent');
 const questionUtils = require('./game-utils');
+const OutputText = require('../tests/fixtures/OutputText');
+const stringUtil = require('../util/string-utils');
 
 class Actions {
+    
     constructor(sessionAttributes) {
         this.sessionAttributes = sessionAttributes || {};
     }
@@ -23,8 +30,11 @@ class Actions {
     incrementSessionId() {
         AnswerIntent.session.sessionId = parseInt(AnswerIntent.session.sessionId) + 1;
         YesIntent.session.sessionId = parseInt(YesIntent.session.sessionId) + 1;
+        NoIntent.session.sessionId = parseInt(NoIntent.session.sessionId) + 1;
         LaunchRequest.session.sessionId = parseInt(LaunchRequest.session.sessionId) + 1;
         HelpIntent.session.sessionId = parseInt(HelpIntent.session.sessionId) + 1;
+        StopIntent.session.sessionId = parseInt(StopIntent.session.sessionId) + 1;
+        StartOverIntent.session.sessionId = parseInt(StopIntent.session.sessionId) + 1;
     }
 
     /**
@@ -39,11 +49,12 @@ class Actions {
                 expect(res.status).to.equal(200);
                 let data = JSON.parse(res.text);
                 let response = JSON.parse(res.text).response;
+                let ssml = stringUtil.extractSSML(data);
                 expect(data.response.outputSpeech.type).to.equal('SSML');
                 // the session must remain open for a user response
                 expect(data.response.shouldEndSession).to.equal(false);
                 // a welcome prompt must be provided.        
-                expect(data.response.outputSpeech.ssml).to.equal('<speak> Welcome to Make Connections, an FT Labs game. For instructions, say "help". Shall we start playing? </speak>');
+                expect(ssml).to.equal(OutputText.WELCOME_SSML);
                 self.sessionAttributes = data.sessionAttributes;
                 return data;
             })
@@ -59,15 +70,7 @@ class Actions {
             yesIntent.session.attributes = this.sessionAttributes;
         }
         let self = this;
-        return chai.request(server)
-            .post('/alexa/')
-            .send(yesIntent)
-            .then(res => {
-                let data = JSON.parse(res.text);
-                expect(res.status).to.equal(200);
-                self.sessionAttributes = data.sessionAttributes;
-                return data;
-            })
+        return this._sendIntent(yesIntent);
     }
 
     /**
@@ -75,20 +78,12 @@ class Actions {
      * @param {*} sessionAttributes 
      */
     sendNoIntent() {
-        let yesIntent = YesIntent;
+        let noIntent = NoIntent;
         if (this.sessionAttributes) {
-            yesIntent.session.attributes = this.sessionAttributes;
+            noIntent.session.attributes = this.sessionAttributes;
         }
         let self = this;
-        return chai.request(server)
-            .post('/alexa/')
-            .send(yesIntent)
-            .then(res => {
-                let data = JSON.parse(res.text);
-                expect(res.status).to.equal(200);
-                self.sessionAttributes = data.sessionAttributes;
-                return data;
-            })
+        return this._sendIntent(noIntent);
     }
 
     /**
@@ -100,15 +95,40 @@ class Actions {
             helpIntent.session.attributes = this.sessionAttributes;
         }
         let self = this;
-        return chai.request(server)
-            .post('/alexa/')
-            .send(helpIntent)
-            .then(res => {
-                let data = JSON.parse(res.text);
-                expect(res.status).to.equal(200);
-                self.sessionAttributes = data.sessionAttributes;
-                return data;
-            })
+        return this._sendIntent(helpIntent);
+    }
+
+    /**
+     * Sends a stop intent to Alexa
+     */
+    sendStopIntent() {
+        let stopIntent = StopIntent;
+        if(this.sessionAttributes) {
+            stopIntent.session.attributes = this.sessionAttributes;
+        }
+        return this._sendIntent(stopIntent)
+    }
+
+    /**
+     * Sends a HelpIntent to Alexa
+     */
+    sendRepeatIntent() {
+        let repeatIntent = RepeatIntent;
+        if (this.sessionAttributes) {
+            repeatIntent.session.attributes = this.sessionAttributes;
+        }
+        return this._sendIntent(repeatIntent);
+    }
+
+    /**
+     * Sends a StartOverIntent to Alexa
+     */
+    sendStartOverIntent() {
+        let startOverIntent = StartOverIntent;
+        if (this.sessionAttributes) {
+            startOverIntent.session.attributes = this.sessionAttributes;
+        }
+        return this._sendIntent(startOverIntent)
     }
 
     /**
@@ -116,13 +136,12 @@ class Actions {
      * @param {*} question 
      */
     answerQuestionCorrectly(question) {
-        let answerSlots;
         let answerIntent = AnswerIntent;
         if (this.sessionAttributes) answerIntent.session.attributes = this.sessionAttributes;
         let self = this;
         return new Promise((resolve, reject) => {
             questionUtils.correctAnswer(question).then(answer => {
-                answerSlots = [{ name: 'Answer', value: answer }];
+                let answerSlots = [{ name: 'Answer', value: answer }];
                 answerIntent.request.intent.slots = formatSlots(answerSlots)
                 chai.request(server)
                     .post('/alexa/')
@@ -143,13 +162,12 @@ class Actions {
      * @param {*} question 
      */
     answerQuestionIncorrectly(question) {
-        let answerSlots;
         let answerIntent = AnswerIntent;
         if (this.sessionAttributes) answerIntent.session.attributes = this.sessionAttributes;
         let self = this;
         return new Promise((resolve, reject) => {
             questionUtils.incorrectAnswer(question).then(answer => {
-                answerSlots = [{ name: 'Answer', value: answer }];
+                let answerSlots = [{ name: 'Answer', value: answer }];
                 answerIntent.request.intent.slots = formatSlots(answerSlots)
                 chai.request(server)
                     .post('/alexa/')
@@ -189,24 +207,23 @@ class Actions {
                 .catch(e => reject(e));
         });
     }
-}
 
-/**
- * Send a NoIntent to Alexa
- * @param {*} sessionAttributes 
- */
-async function sendNoIntent() {
-    if (this.sessionAttributes) YesIntent.session.attributes = this.sessionAttributes;
-    let self = this;
-    let response = await chai.request(server)
-        .post('/alexa/')
-        .send(NoIntent)
-        .then(res => {
-            let data = JSON.parse(res.text);
-            expect(res.status).to.equal(200);
-            return data
-        })
-    return response;
+    /**
+     * Sends an Intent Request to Alexa
+     * @param {*} intent 
+     */
+    _sendIntent(intent) {
+        let self = this;
+        return chai.request(server)
+            .post('/alexa/')
+            .send(intent)
+            .then(res => {
+                let data = JSON.parse(res.text);
+                expect(res.status).to.equal(200);
+                self.sessionAttributes = data.sessionAttributes
+                return data;
+            })
+    }
 }
 
 /**

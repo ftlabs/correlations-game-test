@@ -17,7 +17,7 @@ describe('Test Help Intent', function () {
    * Launch Make Connections
    * Ask for Help
    */
-  it('Should be able to ask for help from the welcome screen', function (done) {
+  it('Should be able to ask for help from the welcome screen and return to a new question.', function (done) {
     chai.request(server)
       .post('/alexa/')
       .send(LaunchRequest)
@@ -28,6 +28,10 @@ describe('Test Help Intent', function () {
           let data = await actions.sendHelpIntent();
           expect(data.response.outputSpeech.ssml).to.contain('"Make Connections" is a quiz game that tests your knowledge of people in the news.')
           expect(data.response.outputSpeech.ssml).to.contain("Would you like to play now?");
+          expect(data.sessionAttributes.STATE).to.equal('_HELPMODE')
+          data = await actions.sendYesIntent();
+          expect(data.response.outputSpeech.ssml).to.contain('Question 1.');
+          expect(data.sessionAttributes.STATE).to.equal('_QUIZMODE')
           done();
         }
         catch (e) {
@@ -36,12 +40,12 @@ describe('Test Help Intent', function () {
       });
   });
 
-   /**
-   * Launch Make Connections
-   * Start the game
-   * Ask for Help
-   */
-  it('Should be able to ask for help from within a question.', function (done) {
+  /**
+  * Launch Make Connections
+  * Start the game
+  * Ask for Help
+  */
+  it('Should be able to ask for help from within a question and return to that question', function (done) {
     chai.request(server)
       .post('/alexa/')
       .send(LaunchRequest)
@@ -49,10 +53,16 @@ describe('Test Help Intent', function () {
         expect(res.status).to.equal(200);
         try {
           await actions.launchMakeConnections();
-          await actions.sendYesIntent();
-          let data = await actions.sendHelpIntent();
+          let data = await actions.sendYesIntent();
+          expect(data.response.outputSpeech.ssml).to.contain('Question 1.');
+          expect(data.sessionAttributes.STATE).to.equal('_QUIZMODE')
+          data = await actions.sendHelpIntent();
           expect(data.response.outputSpeech.ssml).to.contain('"Make Connections" is a quiz game that tests your knowledge of people in the news.')
           expect(data.response.outputSpeech.ssml).to.contain("Would you like to continue your game?");
+          expect(data.sessionAttributes.STATE).to.equal('_HELPMODE')
+          data = await actions.sendYesIntent();
+          expect(data.response.outputSpeech.ssml).to.contain('Question 1.');
+          expect(data.sessionAttributes.STATE).to.equal('_QUIZMODE')
           done();
         }
         catch (e) {

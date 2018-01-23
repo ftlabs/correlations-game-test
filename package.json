@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha tests/ --timeout 10000",
-    "test-html": "mocha tests/ --timeout 10000 --reporter mochawesome"
+    "test": "mocha tests/ --opts ./mocha.opts",
+    "test-html": "mocha tests/ --opts ./mocha.opts --reporter mochawesome --reporter-options reportDir=Report,reportFilename=Alexa-Report",
+    "joke": "node ./util/joke.js"
     
   },
   "author": "",
