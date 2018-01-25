@@ -50,10 +50,7 @@ class Actions {
                 let data = JSON.parse(res.text);
                 let response = JSON.parse(res.text).response;
                 let ssml = stringUtil.extractSSML(data);
-                expect(data.response.outputSpeech.type).to.equal('SSML');
-                // the session must remain open for a user response
-                expect(data.response.shouldEndSession).to.equal(false);
-                // a welcome prompt must be provided.        
+            
                 expect(ssml).to.equal(OutputText.WELCOME_SSML);
                 self.sessionAttributes = data.sessionAttributes;
                 return data;

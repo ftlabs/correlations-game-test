@@ -6,7 +6,6 @@
   "scripts": {
     "test": "mocha tests/ --opts ./mocha.opts",
     "test-html": "mocha tests/ --opts ./mocha.opts --reporter mochawesome --reporter-options reportDir=Report,reportFilename=Alexa-Report",
-    "joke": "node ./util/joke.js"
     
   },
   "author": "",

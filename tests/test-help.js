@@ -26,12 +26,12 @@ describe('Test Help Intent', function () {
         try {
           await actions.launchMakeConnections();
           let data = await actions.sendHelpIntent();
-          expect(data.response.outputSpeech.ssml).to.contain('"Make Connections" is a quiz game that tests your knowledge of people in the news.')
-          expect(data.response.outputSpeech.ssml).to.contain("Would you like to play now?");
-          expect(data.sessionAttributes.STATE).to.equal('_HELPMODE')
+          expect(data).to.have.speech('"Make Connections" is a quiz game that tests your knowledge of people in the news.')
+          expect(data).to.have.speech("Would you like to play now?");
+          expect(data).to.be.state('_HELPMODE');          
           data = await actions.sendYesIntent();
-          expect(data.response.outputSpeech.ssml).to.contain('Question 1.');
-          expect(data.sessionAttributes.STATE).to.equal('_QUIZMODE')
+          expect(data).to.have.speech('Question 1.');
+          expect(data).to.be.state('_QUIZMODE');          
           done();
         }
         catch (e) {
@@ -54,15 +54,15 @@ describe('Test Help Intent', function () {
         try {
           await actions.launchMakeConnections();
           let data = await actions.sendYesIntent();
-          expect(data.response.outputSpeech.ssml).to.contain('Question 1.');
-          expect(data.sessionAttributes.STATE).to.equal('_QUIZMODE')
+          expect(data).to.have.speech('Question 1.');
+          expect(data).to.be.state('_QUIZMODE');          
           data = await actions.sendHelpIntent();
-          expect(data.response.outputSpeech.ssml).to.contain('"Make Connections" is a quiz game that tests your knowledge of people in the news.')
-          expect(data.response.outputSpeech.ssml).to.contain("Would you like to continue your game?");
-          expect(data.sessionAttributes.STATE).to.equal('_HELPMODE')
+          expect(data).to.have.speech('"Make Connections" is a quiz game that tests your knowledge of people in the news.')
+          expect(data).to.have.speech("Would you like to continue your game?");
+          expect(data).to.be.state('_HELPMODE')          
           data = await actions.sendYesIntent();
-          expect(data.response.outputSpeech.ssml).to.contain('Question 1.');
-          expect(data.sessionAttributes.STATE).to.equal('_QUIZMODE')
+          expect(data).to.have.speech('Question 1.');
+          expect(data).to.be.state('_QUIZMODE');          
           done();
         }
         catch (e) {

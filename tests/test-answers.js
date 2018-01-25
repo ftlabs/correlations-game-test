@@ -24,13 +24,17 @@ describe('Answering Questions', function () {
             .end(async (err, res) => {
                 expect(res.status).to.equal(200);
                 try {
+                    //Start Game
                     await actions.launchMakeConnections();
                     let data = await actions.sendYesIntent();
-                    expect(data.response.outputSpeech.ssml).to.contain("Question 1.");
-                    expect(data.response.outputSpeech.type).to.equal('SSML');
+                    
+                    //First Question
+                    expect(data).to.have.speech("Question 1.");
                     expect(data.response.shouldEndSession).to.equal(false);
+
+                    //Repeat question
                     data = await actions.sendRepeatIntent();                    
-                    expect(data.response.outputSpeech.ssml).to.contain("Question 1.");
+                    expect(data).to.have.speech("Question 1.");
                     done();
                 }
                 catch (e) {
@@ -51,14 +55,21 @@ describe('Answering Questions', function () {
             .end(async (err, res) => {
                 expect(res.status).to.equal(200);
                 try {
+                    //Start game
                     await actions.launchMakeConnections();
                     let data = await actions.sendYesIntent();
-                    expect(stringUtils.questionNumber(data.response.outputSpeech.ssml)).to.equal(1)
+
+                    //Get first question
+                    expect(data).to.be.question(1);
+                
+                    //Answer question
                     data = await actions.answerQuestionCorrectly(data.response.outputSpeech.ssml);
-                    expect(data.response.outputSpeech.type).to.equal('SSML');
+            
                     expect(data.response.shouldEndSession).to.equal(false);
-                    expect(data.response.outputSpeech.ssml).to.contain("Correct!");
-                    expect(stringUtils.questionNumber(data.response.outputSpeech.ssml)).to.equal(2);
+                    expect(data).to.have.speech("Correct!");
+
+                    //Next question
+                    expect(data).to.be.question(2);                    
                     done();
                 }
                 catch (e) {
@@ -85,17 +96,18 @@ describe('Answering Questions', function () {
                     let data = await actions.sendYesIntent();
 
                     //Ask first question
-                    expect(stringUtils.questionNumber(data.response.outputSpeech.ssml)).to.equal(1);
+                    expect(data).to.be.question(1);
                     data = await actions.answerQuestionCorrectly(data.response.outputSpeech.ssml);
-                    expect(data.response.outputSpeech.ssml).to.contain("Correct!");
+                    expect(data).to.have.speech("Correct!");
 
                     //Ask Second question
-                    expect(stringUtils.questionNumber(data.response.outputSpeech.ssml)).to.equal(2);                    
+                    expect(data).to.be.question(2);                  
+                      
                     data = await actions.answerQuestionCorrectly(data.response.outputSpeech.ssml);
-                    expect(data.response.outputSpeech.ssml).to.contain("Correct!");
+                    expect(data).to.have.speech("Correct!");
 
                     //Should be on the third question
-                    expect(stringUtils.questionNumber(data.response.outputSpeech.ssml)).to.equal(3);
+                    expect(data).to.be.question(3);
                     
                     done();
                 }
@@ -120,10 +132,9 @@ describe('Answering Questions', function () {
                     await actions.launchMakeConnections();
                     let data = await actions.sendYesIntent();
                     data = await actions.answerQuestionIncorrectly(data.response.outputSpeech.ssml);
-                    expect(data.response.outputSpeech.type).to.equal('SSML');
                     expect(data.response.shouldEndSession).to.equal(false);
-                    expect(data.response.outputSpeech.ssml).to.contain("That was not the correct answer.");
-                    expect(stringUtils.score(data.response.outputSpeech.ssml)).to.equal(0);
+                    expect(data).to.have.speech("That was not the correct answer.");
+                    expect(data).have.score(0)
                     done();
                 }
                 catch (e) {
@@ -147,9 +158,8 @@ describe('Answering Questions', function () {
                     await actions.launchMakeConnections();
                     let data = await actions.sendYesIntent();
                     data = await actions.answerQuestion('abcde');
-                    expect(data.response.outputSpeech.type).to.equal('SSML');
                     expect(data.response.shouldEndSession).to.equal(false);
-                    expect(data.response.outputSpeech.ssml).to.contain("Sorry, I did not understand that.");
+                    expect(data).to.have.speech("Sorry, I did not understand that.")
                     done();
                 }
                 catch (e) {
