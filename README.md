@@ -40,6 +40,12 @@ Custom assertions will always take a response recieved from an individual action
 let data = await launchMakeConnections()
 expect(data).to.have.speech("Welcome to...")
 ```
+Some other examples of custom assertions are:
+
+* expect(data).to.be.a.question()
+* expect(data).to.be.question(1)
+* expect(data).to.have.score(2)
+* expect(data).to.have.state('STATE')
 
 ### Enviroment Params
 * CORRELATIONS_GAME_PATH - Pathway to the correlations game folder
