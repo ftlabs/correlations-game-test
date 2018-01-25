@@ -1,11 +1,11 @@
 {
-  "name": "alexa-flow-tester",
+  "name": "alexa-mocha-tests",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "mocha tests/ --opts ./mocha.opts",
-    "test-html": "mocha tests/ --opts ./mocha.opts --reporter mochawesome --reporter-options reportDir=Report,reportFilename=Alexa-Report",
+    "test-html": "mocha tests/ --opts ./mocha.opts --reporter mochawesome --reporter-options reportDir=Report,reportFilename=Alexa-Report"
     
   },
   "author": "",
