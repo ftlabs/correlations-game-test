@@ -4,14 +4,13 @@ const YesIntent = require('./fixtures/YesIntent');
 const questionUtils = require('../util/game-utils');
 const Actions = require('../util/test-actions')
 const actions = new Actions();
-
+const OutputText = require('./fixtures/OutputText')
 
 describe('Test Help Intent', function () {
 
   beforeEach(() => {
     actions.clear();
   });
-
 
   /**
    * Launch Make Connections
@@ -26,7 +25,7 @@ describe('Test Help Intent', function () {
         try {
           await actions.launchMakeConnections();
           let data = await actions.sendHelpIntent();
-          expect(data).to.have.speech('"Make Connections" is a quiz game that tests your knowledge of people in the news.')
+          expect(data).to.have.speech(OutputText.HELP_SSML)
           expect(data).to.have.speech("Would you like to play now?");
           expect(data).to.be.state('_HELPMODE');          
           data = await actions.sendYesIntent();
@@ -57,12 +56,12 @@ describe('Test Help Intent', function () {
           expect(data).to.have.speech('Question 1.');
           expect(data).to.be.state('_QUIZMODE');          
           data = await actions.sendHelpIntent();
-          expect(data).to.have.speech('"Make Connections" is a quiz game that tests your knowledge of people in the news.')
+          expect(data).to.have.speech(OutputText.HELP_SSML)
           expect(data).to.have.speech("Would you like to continue your game?");
           expect(data).to.be.state('_HELPMODE')          
           data = await actions.sendYesIntent();
           expect(data).to.have.speech('Question 1.');
-          expect(data).to.be.state('_QUIZMODE');          
+          expect(data).to.be.state('_QUIZMODE');  
           done();
         }
         catch (e) {

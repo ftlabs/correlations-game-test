@@ -15,6 +15,32 @@ Generate Report
 ```sh
 $ npm run test-html
 ```
+
+## Usage
+
+### Actions
+
+Actions are commands that can be sent to the Alexa, e.g:
+
+* launchMakeConnections()
+* sendYesIntent()
+* answerQuestionCorrectly()
+* answerQuestionIncorrectly()
+* sendHelpIntent()
+
+Each action will return a promise, containing the response from the Alexa skill.
+Each response will typically contain output speech(ssml), a card to render and any state/session attributes.
+
+### Custom assertions
+
+As well as the standard assertions includded within Chai, a few custom assertions are being built to further the reach of the tests and make existing assertions more semantic.
+Custom assertions will always take a response recieved from an individual action, for example:
+
+```javascript
+let data = await launchMakeConnections()
+expect(data).to.have.speech("Welcome to...")
+```
+
 ### Enviroment Params
 * CORRELATIONS_GAME_PATH - Pathway to the correlations game folder
 * TEST_MODE - Set this to "TRUE"
