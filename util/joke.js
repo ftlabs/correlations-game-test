@@ -1,4 +1,6 @@
-
+/**
+ * Retreives a Joke for a failed test.
+ */
 function fetchJoke() {
     return fetch('https://icanhazdadjoke.com/', {
       headers: {

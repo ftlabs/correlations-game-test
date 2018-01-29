@@ -1,4 +1,3 @@
-
 const helper = require('../correlations-service/helpers/test-helper')
 
 /**

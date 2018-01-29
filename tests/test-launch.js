@@ -25,7 +25,8 @@ describe('Launch Make Connections', function () {
       .end(async (err, res) => {
         expect(res.status).to.equal(200);
         try {
-          await actions.launchMakeConnections();
+          let data = await actions.launchMakeConnections();
+          expect(data).to.have.speech(OutputText.WELCOME_SSML);
           done();
         }
         catch (e) {
@@ -48,7 +49,7 @@ describe('Launch Make Connections', function () {
         try {
           let data = await actions.launchMakeConnections();
           data = await actions.sendYesIntent();
-          expect(data).to.have.speech();
+          expect(data).to.have.speech('Question 1');
           expect(data.response.shouldEndSession).to.equal(false);
           done();
         }

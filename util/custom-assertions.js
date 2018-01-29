@@ -47,7 +47,7 @@ Assertion.addMethod('score', function (expectedScore = null) {
   const obj = this._obj;
   let ssml = obj.response.outputSpeech.ssml;
   if (typeof expectedScore != 'number') {
-    assert.fail(typeof expectedScore, 'number', "Expected score must be a number", "+");
+    assert.fail(typeof expectedScore, 'number', "Expected score must be a number");
   }
   const actualScore = stringUtils.score(ssml);
   this.assert(expectedScore === actualScore,
@@ -63,7 +63,6 @@ Assertion.addMethod('state', function (expectedState = null) {
   const obj = this._obj;
   let currentState = obj.sessionAttributes.STATE;
   if (expectedState) {
-    ;
     new Assertion(currentState).to.equal(expectedState);
   }
 });
